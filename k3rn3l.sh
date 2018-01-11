@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
+# constants
+readonly KERNEL_SOURCE_DIRECTORY="/usr/src/"
+readonly SCRIPT_VERSION="1.0.0"
+
 # global stuff - those can be overridden via ENV vars
 GRUB_CMD=grub-mkconfig
 
-# constants
-readonly KERNEL_SOURCE_DIRECTORY="/usr/src/"
 
 . ./lib/utils.sh
 
@@ -59,6 +61,7 @@ available options:
     -v, --verbose   Verbose output
     -q, --quiet     Less output
     -h, --help      Show this help screen
+    --version       Show the script version
 EOF
 
     exit 0
@@ -73,7 +76,7 @@ function parseArgs {
             -s|--skip-requirements)
                 skipRequirements=1
                 ;;
-             -v|--verbose)
+            -v|--verbose)
                 verbose=1
                 ;;
             -q|--quiet)
@@ -81,6 +84,10 @@ function parseArgs {
                 ;;
             -h|--help)
                 usage
+                ;;
+            --version)
+                echo "$SCRIPT_VERSION"
+                exit 0
                 ;;
             *)
                 if beginsWith "$1" "-"; then
