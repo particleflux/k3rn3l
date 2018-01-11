@@ -1,11 +1,6 @@
-#install:
-#    cp k3rn3l
 
-
-
-# install script with lib/includes to .local/share
-# add wrapper script to .local/bin
-
-#!/usr/bin/env bash
-    #cd /path/to/where/bundle/was/installed
-    #exec "bin/realscript" "$@"
+install: k3rn3l.sh lib/utils.sh
+	mkdir -p /opt/k3rn3l
+	cp -r k3rn3l.sh lib /opt/k3rn3l/
+	echo -e '#!/usr/bin/env bash\ncd /opt/k3rn3l\nexec ./k3rn3l.sh "$$@"' > /opt/bin/k3rn3l
+	chmod +x /opt/bin/k3rn3l

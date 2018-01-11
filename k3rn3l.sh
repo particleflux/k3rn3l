@@ -22,7 +22,7 @@ function requirements() {
 
 function usage {
     cat <<EOF
-k3rn3l command [options]
+k3rn3l <command> [options]
 
     Gentoo linux kernel management.
 
