@@ -3,7 +3,7 @@
 Gentoo kernel management script.
 
 **DISCLAIMER** Use at your own risk! I can not guarantee that this script is 
-working perfectly. It could potentially render your whole system unsuable!
+working perfectly. It could potentially render your whole system unusable!
 
 
 ## Installation
