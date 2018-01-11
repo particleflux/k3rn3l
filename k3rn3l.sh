@@ -20,7 +20,7 @@ function requirements() {
 
 function usage {
     cat <<EOF
-k3rn3l [options] command
+k3rn3l command [options]
 
     Gentoo linux kernel management.
 
@@ -65,6 +65,9 @@ EOF
 }
 
 function parseArgs {
+    cmd="$1"
+    shift
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             -p|--pretend)
@@ -86,8 +89,6 @@ function parseArgs {
         esac
         shift
     done
-
-    cmd="$1"
 }
 
 function detectCurrentKernel {
