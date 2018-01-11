@@ -9,8 +9,8 @@ readonly KERNEL_SOURCE_DIRECTORY="/usr/src/"
 function requirements() {
 
     [[ -e '/etc/gentoo-release' ]] || die 'This script supports only gentoo'
+    [[ "$EUID" -eq 0 ]] || die 'This script needs to be run as root'
 
-# run as root
 # grub available
 
 #    (eb -h &> /dev/null) \
