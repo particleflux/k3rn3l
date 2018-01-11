@@ -65,9 +65,6 @@ EOF
 }
 
 function parseArgs {
-    cmd="$1"
-    shift
-
     while [[ $# -gt 0 ]]; do
         case $1 in
             -p|--pretend)
@@ -85,7 +82,16 @@ function parseArgs {
             -h|--help)
                 usage
                 ;;
-            *) break ;;
+            *)
+                if beginsWith "$1" "-"; then
+                    die "Unknown option '$1'"
+                fi
+
+                if [[ -z "$cmd" ]]; then
+                    cmd="$1"
+                fi
+                break
+                ;;
         esac
         shift
     done
@@ -166,7 +172,22 @@ function main {
     parseArgs "$@"
     [[ $skipRequirements ]] || requirements
 
-    clean
+    echo "cmd is '$cmd'"
+exit 0
+
+    case "$cmd" in
+        clean)
+            clean
+            ;;
+        help)
+            usage
+            ;;
+        *)
+            die "Unknown command given: '$cmd'"
+            ;;
+    esac
+
+    exit 0
 }
 
 

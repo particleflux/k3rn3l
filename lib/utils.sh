@@ -6,22 +6,30 @@ quiet=
 
 # default log output
 # deactivated when quiet=1
-function l() {
+function l {
     [[ -n "$quiet" ]] || echo -e "$*"
 }
 
 # log if verbose=1
-function v() {
+function v {
     [[ -n "$verbose" ]] && l "$*"
 }
 
 # log errors
 # errors go to STDERR and always log, even if quiet=1
-function e() {
+function e {
     (>&2 echo -e "\e[31m$*\e[0m")
 }
 
-function die () {
+function die {
     e "$@"
     exit 1
+}
+
+# check if string $1 begins with string $2
+function beginsWith {
+    case "$1" in
+        "$2"*) true ;;
+        *) false ;;
+    esac
 }
