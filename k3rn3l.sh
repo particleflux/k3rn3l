@@ -89,8 +89,9 @@ function parseArgs {
 
                 if [[ -z "$cmd" ]]; then
                     cmd="$1"
+                else
+                    die "argument is not allowed here: $1"
                 fi
-                break
                 ;;
         esac
         shift
