@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# global stuff - those can be overridden via ENV vars
+GRUB_CMD=grub-mkconfig
+
 # constants
 readonly KERNEL_SOURCE_DIRECTORY="/usr/src/"
 
@@ -110,6 +113,13 @@ function detectCurrentKernel {
     echo "$eselectKernel"
 }
 
+function mountBoot {
+    if ! findmnt /boot &> /dev/null ; then
+        l "/boot not mounted, mounting..."
+        mount /boot || die "Failed to mount /boot"
+    fi
+}
+
 function clean {
     local currentKernel currentVersion removalList
     removalList=()
@@ -130,11 +140,7 @@ function clean {
     done
 
     l "\nCleaning /boot/ ..."
-    if ! findmnt /boot &> /dev/null ; then
-        l "/boot not mounted, mounting..."
-        mount /boot || die "Failed to mount /boot"
-    fi
-
+    mountBoot
 
     for bootFile in /boot/vmlinuz-* /boot/config-* /boot/System.map-* ; do
         if [[ "$(basename "$bootFile" | cut -d '-' -f 1 --complement)" == "$currentVersion" ]]; then
@@ -147,14 +153,13 @@ function clean {
     done
 
     l ""
-
     if [[ ${#removalList[@]} -eq 0 ]]; then
         l "Nothing to delete"
         exit 0
     fi
 
     if [[ -z "$dryRun" ]]; then
-        v "About to execute: rm -rf \"${removalList[@]}\""
+        v "About to execute: rm -rf ${removalList[@]}"
         read -r -p "Are you sure? [y/N] " response
         if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
             l 'User aborted'
@@ -166,6 +171,19 @@ function clean {
     $dryRun rm -rf "${removalList[@]}"
 }
 
+function recompile {
+    cd "${KERNEL_SOURCE_DIRECTORY}linux"
+
+    mountBoot
+    l 'Starting kernel compilation...'
+    if ! ( make -j $(nproc) && make modules_install && make install ) ; then
+        die 'Kernel compilation failed'
+    fi
+
+    l 'Updating grub config...'
+    $dryRun $GRUB_CMD -o /boot/grub/grub.cfg
+}
+
 
 function main {
     local dryRun skipRequirements grubCmd cmd
@@ -173,12 +191,10 @@ function main {
     parseArgs "$@"
     [[ $skipRequirements ]] || requirements
 
-    echo "cmd is '$cmd'"
-exit 0
-
+    v "Executing command '$cmd'"
     case "$cmd" in
-        clean)
-            clean
+        clean|recompile)
+            $cmd
             ;;
         help)
             usage
