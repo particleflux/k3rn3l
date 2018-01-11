@@ -77,9 +77,11 @@ function parseArgs {
                 skipRequirements=1
                 ;;
             -v|--verbose)
+                # shellcheck disable=SC2034
                 verbose=1
                 ;;
             -q|--quiet)
+                # shellcheck disable=SC2034
                 quiet=1
                 ;;
             -h|--help)
@@ -167,6 +169,7 @@ function clean {
     fi
 
     if [[ -z "$dryRun" ]]; then
+        # shellcheck disable=SC2145
         v "About to execute: rm -rf ${removalList[@]}"
         read -r -p "Are you sure? [y/N] " response
         if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
@@ -180,11 +183,11 @@ function clean {
 }
 
 function recompile {
-    cd "${KERNEL_SOURCE_DIRECTORY}linux"
+    cd "${KERNEL_SOURCE_DIRECTORY}linux" || die "Unable to change to kernel dir"
 
     mountBoot
     l 'Starting kernel compilation...'
-    if ! ( make -j $(nproc) && make modules_install && make install ) ; then
+    if ! ( make -j "$(nproc)" && make modules_install && make install ) ; then
         die 'Kernel compilation failed'
     fi
 
@@ -211,7 +214,7 @@ function update {
     ( $dryRun eselect kernel set "$newKernel" ) \
         || die "Switching to new kernel failed"
 
-    cd "${KERNEL_SOURCE_DIRECTORY}linux"
+    cd "${KERNEL_SOURCE_DIRECTORY}linux" || die "Unable to change to kernel dir"
 
     v 'Copying old config...'
     [[ -e "../$oldKernel/.config" ]] \
@@ -220,7 +223,7 @@ function update {
 
     mountBoot
     l 'Starting kernel compilation...'
-    if ! ( make oldconfig && make -j $(nproc) && $dryRun make modules_install && $dryRun make install ) ; then
+    if ! ( make oldconfig && make -j "$(nproc)" && $dryRun make modules_install && $dryRun make install ) ; then
         die 'Kernel compilation failed'
     fi
 
@@ -232,7 +235,7 @@ function update {
 }
 
 function main {
-    local dryRun skipRequirements grubCmd cmd
+    local dryRun skipRequirements cmd
 
     parseArgs "$@"
     [[ $skipRequirements ]] || requirements
