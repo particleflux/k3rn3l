@@ -10,14 +10,11 @@ readonly KERNEL_SOURCE_DIRECTORY="/usr/src/"
 
 
 function requirements() {
+    v 'Checking script requirements...'
 
     [[ -e '/etc/gentoo-release' ]] || die 'This script supports only gentoo'
     [[ "$EUID" -eq 0 ]] || die 'This script needs to be run as root'
-
-# grub available
-
-#    (eb -h &> /dev/null) \
-#        || die 'aws eb cli not found - install with "pip install awsebcli"'
+    ( $GRUB_CMD --version &> /dev/null ) || die "$GRUB_CMD not found"
 }
 
 
@@ -51,16 +48,16 @@ available commands:
     update
         Update to the newest kernel version
 
-        Update to the newest installed kernel version. The new kernel compilation
+        Update to the newest installed kernel version. The kernel compilation
         tries to use old kernel config as far as possible, asking for changed or
         new kernel configuration options (make oldconfig)
 
 
 available options:
 
-    -p, --pretend   Do a dry-run, don't actually do anything
+    -p, --pretend   Do a dry-run, don't actually do anything harmful
     -v, --verbose   Verbose output
-    -q, --quiet     Only output errors
+    -q, --quiet     Less output
     -h, --help      Show this help screen
 EOF
 
@@ -130,7 +127,9 @@ function clean {
 
     l "\nCleaning kernel sources..."
     for directory in $KERNEL_SOURCE_DIRECTORY* ; do
-        if [[ "$directory" == "$KERNEL_SOURCE_DIRECTORY$currentKernel" || "$directory" == "${KERNEL_SOURCE_DIRECTORY}linux" ]]; then
+        if [[ "$directory" == "$KERNEL_SOURCE_DIRECTORY$currentKernel" \
+            || "$directory" == "${KERNEL_SOURCE_DIRECTORY}linux" ]]; then
+
             l "Skipping current kernel directory \e[32m$directory\e[0m"
             continue;
         fi
@@ -143,7 +142,9 @@ function clean {
     mountBoot
 
     for bootFile in /boot/vmlinuz-* /boot/config-* /boot/System.map-* ; do
-        if [[ "$(basename "$bootFile" | cut -d '-' -f 1 --complement)" == "$currentVersion" ]]; then
+        if [[ "$(basename "$bootFile" | cut -d '-' -f 1 --complement)" \
+            == "$currentVersion" ]]; then
+
             l "Skipping current kernel file \e[32m$bootFile\e[0m"
             continue
         fi
@@ -184,6 +185,44 @@ function recompile {
     $dryRun $GRUB_CMD -o /boot/grub/grub.cfg
 }
 
+function update {
+    local oldKernel newKernel
+
+    l 'Updating kernel...'
+
+    v 'Determining kernel versions...'
+    oldKernel=$(eselect kernel list | grep '\*' | awk '{print $2}')
+    newKernel=$(eselect kernel list | tail -n 1 | awk '{print $2}')
+
+    if [[ -z "$oldKernel" ]]; then
+        die 'Could not determine kernel versions'
+    fi
+
+    [[ "$oldKernel" != "$newKernel" ]] || die 'Only one kernel version installed'
+
+    l "Switching from $oldKernel to $newKernel"
+    ( $dryRun eselect kernel set "$newKernel" ) \
+        || die "Switching to new kernel failed"
+
+    cd "${KERNEL_SOURCE_DIRECTORY}linux"
+
+    v 'Copying old config...'
+    [[ -e "../$oldKernel/.config" ]] \
+        || die "Error: No .config present for $oldKernel"
+    cp "../$oldKernel/.config" ./
+
+    mountBoot
+    l 'Starting kernel compilation...'
+    if ! ( make oldconfig && make -j $(nproc) && $dryRun make modules_install && $dryRun make install ) ; then
+        die 'Kernel compilation failed'
+    fi
+
+    l 'Rebuilding kernel modules...'
+    ( $dryRun emerge -q @module-rebuild ) || die 'module-rebuild failed'
+
+    l 'Updating grub config...'
+    $dryRun $GRUB_CMD -o /boot/grub/grub.cfg
+}
 
 function main {
     local dryRun skipRequirements grubCmd cmd
@@ -193,7 +232,7 @@ function main {
 
     v "Executing command '$cmd'"
     case "$cmd" in
-        clean|recompile)
+        clean|recompile|update)
             $cmd
             ;;
         help)
