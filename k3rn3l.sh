@@ -173,8 +173,8 @@ function clean {
     $unmergeCmd || die 'unmerging failed!'
 
 
-    l "\nCleaning kernel sources..."
-    for directory in $KERNEL_SOURCE_DIRECTORY* ; do
+    l "\\nCleaning kernel sources..."
+    for directory in "$KERNEL_SOURCE_DIRECTORY"* ; do
         if [[ "$directory" == "$KERNEL_SOURCE_DIRECTORY$currentKernel" \
             || "$directory" == "${KERNEL_SOURCE_DIRECTORY}linux" ]]; then
 
