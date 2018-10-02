@@ -25,7 +25,7 @@ function v {
 # log errors
 # errors go to STDERR and always log, even if quiet=1
 function e {
-    (>&2 echo -e "\e[31m$*\e[0m")
+    (>&2 echo -e "\\e[31m$*\\e[0m")
 }
 
 function die {
@@ -165,31 +165,31 @@ function clean {
 
     l "Current kernel: $currentKernel"
 
-    l "\nCleaning kernel sources..."
-    for directory in $KERNEL_SOURCE_DIRECTORY* ; do
+    l "\\nCleaning kernel sources..."
+    for directory in "$KERNEL_SOURCE_DIRECTORY"* ; do
         if [[ "$directory" == "$KERNEL_SOURCE_DIRECTORY$currentKernel" \
             || "$directory" == "${KERNEL_SOURCE_DIRECTORY}linux" ]]; then
 
-            l "Skipping current kernel directory \e[32m$directory\e[0m"
+            l "Skipping current kernel directory \\e[32m$directory\\e[0m"
             continue;
         fi
 
-        l "Slating for removal: \e[31m$directory\e[0m"
+        l "Slating for removal: \\e[31m$directory\\e[0m"
         removalList+=("$directory")
     done
 
-    l "\nCleaning /boot/ ..."
+    l "\\nCleaning /boot/ ..."
     mountBoot
 
     for bootFile in /boot/vmlinuz-* /boot/config-* /boot/System.map-* ; do
         if [[ "$(basename "$bootFile" | cut -d '-' -f 1 --complement)" \
             == "$currentVersion" ]]; then
 
-            l "Skipping current kernel file \e[32m$bootFile\e[0m"
+            l "Skipping current kernel file \\e[32m$bootFile\\e[0m"
             continue
         fi
 
-        l "Slating for removal: \e[31m$bootFile\e[0m"
+        l "Slating for removal: \\e[31m$bootFile\\e[0m"
         removalList+=("$bootFile")
     done
 
