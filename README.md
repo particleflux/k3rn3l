@@ -8,12 +8,9 @@ working perfectly. It could potentially render your whole system unusable!
 
 ## Installation
 
-You can either directly cd to the scripts directory and call the k3rn3l.sh, or
-use `sudo make install` to install to `/opt/`. The Makefile will install a
-wrapper script in /opt/bin/, which acts as an entry script changing into the
-/opt/k3rn3l directory for the actual execution.
-
-
+```
+sudo make install
+```
 
 ## Usage
 
