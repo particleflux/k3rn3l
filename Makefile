@@ -2,12 +2,12 @@ SHELL = /bin/sh
 SHELLCHECK = shellcheck
 SHELLCHECK_OPTS = -x
 
-PREFIX=/usr/local
-BINDIR=$(PREFIX)/bin
+PREFIX ?= /usr/local
+BINDIR ?= $(PREFIX)/bin
 
 .PHONY: install
 install: k3rn3l.sh
-	install $< $(DESTDIR)$(BINDIR)/k3rn3l
+	install -D  $< $(DESTDIR)$(BINDIR)/k3rn3l
 
 .PHONY: shellcheck
 shellcheck: k3rn3l.sh
