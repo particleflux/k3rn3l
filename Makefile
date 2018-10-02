@@ -3,7 +3,7 @@ SHELLCHECK = shellcheck
 SHELLCHECK_OPTS = -x
 
 PREFIX=/usr/local
-BINDIR=$(prefix)/bin
+BINDIR=$(PREFIX)/bin
 
 .PHONY: install
 install: k3rn3l.sh
