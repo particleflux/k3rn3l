@@ -24,7 +24,6 @@ available commands:
     clean
         Cleanup older kernel versions.
 
-        You should run emerge --depclean first, though it is not required.
         This deletes all kernel files for kernels older than the current one, so
         ensure that the current kernel boots correctly.
 
