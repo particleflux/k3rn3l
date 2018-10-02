@@ -158,15 +158,23 @@ function mountBoot {
 }
 
 function clean {
-    local currentKernel currentVersion removalList
+    local currentKernel currentVersion removalList unmergeCmd
     removalList=()
     currentKernel=$(detectCurrentKernel)
     currentVersion=$(echo "$currentKernel" | cut -d '-' -f 1 --complement)
 
     l "Current kernel: $currentKernel"
 
-    l "\\nCleaning kernel sources..."
-    for directory in "$KERNEL_SOURCE_DIRECTORY"* ; do
+    l "\\nUnmerging old kernel slots..."
+    unmergeCmd="emerge --depclean gentoo-sources -a"
+    if [[ -n "$dryRun" ]]; then
+        unmergeCmd="$unmergeCmd -p"
+    fi
+    $unmergeCmd || die 'unmerging failed!'
+
+
+    l "\nCleaning kernel sources..."
+    for directory in $KERNEL_SOURCE_DIRECTORY* ; do
         if [[ "$directory" == "$KERNEL_SOURCE_DIRECTORY$currentKernel" \
             || "$directory" == "${KERNEL_SOURCE_DIRECTORY}linux" ]]; then
 
