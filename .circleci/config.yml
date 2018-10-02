@@ -37,7 +37,7 @@ jobs:
     - run:
         command: |
           /tmp/cc-test-reporter before-build
-          kcov --include-path=. coverage bats test/
+          kcov --include-path=. --exclude-path=test coverage bats test/
           xml="$(ls -1 coverage/bats*/cobertura.xml | head -1)"
 
           # removing trailing slash in cobertura <source>
