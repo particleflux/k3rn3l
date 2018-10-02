@@ -108,11 +108,9 @@ function parseArgs {
                 skipRequirements=1
                 ;;
             -v|--verbose)
-                # shellcheck disable=SC2034
                 verbose=1
                 ;;
             -q|--quiet)
-                # shellcheck disable=SC2034
                 quiet=1
                 ;;
             -h|--help)
@@ -295,5 +293,6 @@ function main {
     exit 0
 }
 
-
-main "$@"
+if [[ "$0" != *bats* ]]; then
+    main "$@"
+fi

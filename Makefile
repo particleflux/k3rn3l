@@ -2,13 +2,25 @@ SHELL = /bin/sh
 SHELLCHECK = shellcheck
 SHELLCHECK_OPTS = -x
 
-prefix=/usr/local
-bindir=$(prefix)/bin
+PREFIX=/usr/local
+BINDIR=$(prefix)/bin
 
 .PHONY: install
 install: k3rn3l.sh
-	install $< $(DESTDIR)$(bindir)/k3rn3l
+	install $< $(DESTDIR)$(BINDIR)/k3rn3l
 
 .PHONY: shellcheck
 shellcheck: k3rn3l.sh
 	$(SHELLCHECK) $(SHELLCHECK_OPTS) $<
+
+.PHONY: test
+test:
+	bats test
+
+.PHONY: coverage
+coverage:
+	kcov --include-path=. coverage bats test/
+
+.PHONY: clean
+clean:
+	rm -rf ./coverage
