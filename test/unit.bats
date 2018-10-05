@@ -1,9 +1,13 @@
 #!/usr/bin/env bats
 
+kernelDir=
+
 setup()
 {
     . shellmock
     shellmock_clean
+
+    kernelDir=$(mktemp -d)
 }
 
 teardown()
@@ -12,6 +16,8 @@ teardown()
         shellmock_clean
         rm -f sample.out
     fi
+
+    rm -rf "$kernelDir"
 }
 
 @test "utils log function" {
@@ -136,6 +142,8 @@ teardown()
 
 @test "recompile failing compilation" {
     source "$BATS_TEST_DIRNAME/../k3rn3l.sh"
+    KERNEL_SOURCE_DIRECTORY="$kernelDir/"
+    mkdir -p "$kernelDir/linux"
 
     shellmock_expect findmnt --status 0 --match '/boot'
     shellmock_expect make --status 1
@@ -148,6 +156,8 @@ teardown()
 
 @test "recompile successful compilation" {
     source "$BATS_TEST_DIRNAME/../k3rn3l.sh"
+    KERNEL_SOURCE_DIRECTORY="$kernelDir/"
+    mkdir -p "$kernelDir/linux"
 
     shellmock_expect findmnt --status 0 --match '/boot'
     shellmock_expect make --status 0 --match '' --type partial

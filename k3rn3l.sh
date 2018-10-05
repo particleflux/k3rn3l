@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 # constants
-readonly KERNEL_SOURCE_DIRECTORY="/usr/src/"
 readonly SCRIPT_VERSION="1.1.0"
 
 # global stuff - those can be overridden via ENV vars
 GRUB_CMD=grub-mkconfig
-
+KERNEL_SOURCE_DIRECTORY="/usr/src/"
 
 verbose=
 quiet=
