@@ -1,5 +1,8 @@
 # k3rn3l
 
+[![CircleCI](https://circleci.com/gh/particleflux/k3rn3l.svg?style=shield)](https://circleci.com/gh/particleflux/k3rn3l)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8e240180d5ec6d717b4a/test_coverage)](https://codeclimate.com/github/particleflux/k3rn3l/test_coverage)
+
 Gentoo kernel management script.
 
 **DISCLAIMER** Use at your own risk! I can not guarantee that this script is 
