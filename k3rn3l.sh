@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # constants
-readonly SCRIPT_VERSION="1.1.0"
+readonly SCRIPT_VERSION="1.2.0"
 
 # global stuff - those can be overridden via ENV vars
 GRUB_CMD=grub-mkconfig
