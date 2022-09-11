@@ -216,6 +216,9 @@ function clean {
 
     l "Deleting..."
     $dryRun rm -rf "${removalList[@]}"
+
+    l 'Updating grub config...'
+    $dryRun $GRUB_CMD -o /boot/grub/grub.cfg
 }
 
 function recompile {
